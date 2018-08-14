@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <title>Email dispatcher</title>
+   <script
+         src="https://code.jquery.com/jquery-3.3.1.min.js"
+         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+         crossorigin="anonymous"></script>
+</head>
+<body>
+
+   Request Sent: <span id="sentCount">0</span>
+   <!--/<span id="maxRequests"></span> -->
+   <br/>
+   Success: <span id="successRequests">0</span> <br/>
+   Failed: <span id="failedRequests">0</span> <br/>
+
+
+   <script>
+
+   var maxRequests = 1;
+   var totalRequestSent = 0;
+   var pauseRequest = 0;
+   var firstRequestTime = 0;
+   var successRequests = 0;
+   var failedRequests = 0;
+
+   $(document).ready(function () {
+
+//      $('#maxRequests').html(maxRequests);
+
+      var timerId = setInterval(function () {
+         sendRequest();
+      },2*1000);
+
+
+   });
+
+
+   function sendRequest()
+   {
+      if( pauseRequest==1 ){
+         console.log('request paused!');
+         return;
+      }
+
+      if( totalRequestSent >= maxRequests ){
+         console.log('totalRequestSent >= maxRequests');
+         return;
+      }
+
+      if(totalRequestSent==0)
+      {
+         firstRequestTime = new Date();
+      }
+
+      $.post("/mailer/gmail.php",function () {
+         successRequests++;
+         $('#successRequests').html(successRequests);
+      }).fail(function (xhr,txtStatus,err) {
+         console.log(xhr);
+         failedRequests++;
+         $('#failedRequests').html(failedRequests);
+      });
+
+      totalRequestSent++;
+      $('#sentCount').html(totalRequestSent);
+   }
+
+   </script>
+
+</body>
+</html>
